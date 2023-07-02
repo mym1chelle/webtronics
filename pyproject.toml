@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "webtronics"
+version = "0.1.0"
+description = ""
+authors = ["Timur <81976283+mym1chelle@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.99.0"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.17"}
+alembic = "^1.11.1"
+environs = "^9.5.0"
+
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.2"
+flake8 = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

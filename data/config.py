@@ -13,8 +13,16 @@ class DataBaseConfig:
 
 
 @dataclass
+class AuthTokenConfig:
+    secret_key: str
+    algorithm: str
+    expire_minutes: int
+
+
+@dataclass
 class Config:
     db: DataBaseConfig
+    auth: AuthTokenConfig
 
 
 def load_config(path: str = None):
@@ -29,5 +37,10 @@ def load_config(path: str = None):
             user=env.str('DB_USER'),
             database=env.str('DB_NAME'),
             port=env.str('DB_PORT')
+        ),
+        auth=AuthTokenConfig(
+            secret_key=env.str('SECRET_KEY'),
+            algorithm=env.str('ALGORITHM'),
+            expire_minutes=env.int('EXPIRE_MINUTES')
         )
     )

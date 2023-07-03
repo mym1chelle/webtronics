@@ -53,7 +53,10 @@ class UserManager:
     async def create_user(self, username: str, password: str):
         user = await self.get_user(username)
         if user:
-            raise HTTPException(status_code=403, detail=f'Пользователь с username {username} уже существует')
+            raise HTTPException(
+                status_code=403,
+                detail=f'The user with username {username} alredy exist'
+            )
         else:
             new_user = User(
                 username=username,
@@ -91,5 +94,7 @@ class UserManager:
         return user
 
 
-async def get_current_active_user(current_user: UserRead = Depends(UserManager().get_current_user)):
+async def get_current_active_user(
+        current_user: UserRead = Depends(UserManager().get_current_user)
+):
     return current_user

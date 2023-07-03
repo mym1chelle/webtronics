@@ -27,6 +27,7 @@ async def get_posts(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ):
+    """Viewing posts"""
     return await get_all_posts(session=session)
 
 
@@ -36,7 +37,7 @@ async def add_post(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ) -> ShowPost:
-    """Добавление нового поста"""
+    """Adding a new post"""
     new_post = Post(
         user_id=user.id,
         text=post.text
@@ -59,7 +60,7 @@ async def edit_post(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ) -> ShowPost:
-    """Редактирование поста"""
+    """Editing a post"""
     return await update_post(
         session=session,
         post_id=post_id,
@@ -74,7 +75,7 @@ async def delete_post(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ) -> ShowPost:
-    """Удаление поста"""
+    """Deleting a post"""
     return await remove_post(
         session=session,
         post_id=post_id,
@@ -88,7 +89,7 @@ async def set_like(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ):
-    """Поставить лайк на пост"""
+    """Like a post"""
     return await set_like_for_post(
         session=session,
         post_id=post_id,
@@ -102,7 +103,7 @@ async def set_dislike(
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ):
-    """Поставить дизлайк на пост"""
+    """Dislike a post"""
     return await set_dislike_for_post(
         session=session,
         post_id=post_id,

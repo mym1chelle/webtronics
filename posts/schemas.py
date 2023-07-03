@@ -14,6 +14,10 @@ class AddPost(BaseModel):
     text: str
 
 
+class UpdatePost(AddPost):
+    pass
+
+
 class ShowPost(ExtendedModel):
     id: int
     text: str

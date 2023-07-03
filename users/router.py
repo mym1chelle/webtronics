@@ -2,12 +2,14 @@ from datetime import timedelta
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from users.models import UserManager, get_current_active_user
 from data.database import get_async_session
 
+from users.models import UserManager, get_current_active_user
 from users.auth import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from users.schemas import UserRead, Token, UserCreate
+from users.constants import (
+    INCORRECT_CREDENTIALS_ERROR
+)
 
 router = APIRouter(
     prefix='/users',
@@ -45,7 +47,7 @@ async def login_for_access_token(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail=INCORRECT_CREDENTIALS_ERROR,
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

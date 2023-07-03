@@ -4,9 +4,22 @@ from sqlalchemy import select, func
 from fastapi import HTTPException, Response
 from posts.models import Post, Like, Dislike
 from posts.func import annotate
+from posts.constants import (
+    POST_NOT_EXISTS_ERROR,
+    POST_UPDATE_ERROR,
+    POST_DELETE_ERROR,
+    POST_LIKE_ERROR,
+    POST_OWN_LIKE_ERROR,
+    POST_DISLIKE_ERROR,
+    POST_OWN_DISLIKE_ERROR
+)
 
 
-async def get_all_posts(session: AsyncSession):
+async def get_all_posts(
+        session: AsyncSession,
+        limit: int,
+        offset: int
+):
     query = select(
         Post,
         func.count(Like.id).filter(Post.id == Like.post_id).label('likes'),
@@ -16,7 +29,9 @@ async def get_all_posts(session: AsyncSession):
         Like, isouter=True
     ).join(
         Dislike, isouter=True
-    ).group_by(Post.id).options(selectinload(Post.created_by))
+    ).group_by(Post.id).options(
+        selectinload(Post.created_by)
+    ).limit(limit).offset(offset)
     result = await session.execute(query)
     return [la for la in annotate(result)]
 
@@ -27,8 +42,8 @@ async def get_post(session: AsyncSession, post_id: int):
     post = result.scalars().first()
     if not post:
         raise HTTPException(
-            status_code=404, detail=f'The post with id {post_id} does not exist'
-    )
+            status_code=404, detail=POST_NOT_EXISTS_ERROR.format(id=post_id)
+        )
     return post
 
 
@@ -39,8 +54,8 @@ async def update_post(
     if post_for_update.user_id != creator_id:
         raise HTTPException(
             status_code=401,
-            detail='You cannot update posts that are not your own'
-    )
+            detail=POST_UPDATE_ERROR
+        )
     post_for_update.text = text
     await session.commit()
     await session.refresh(post_for_update, ["created_by"])
@@ -52,8 +67,8 @@ async def remove_post(session: AsyncSession, post_id: int, creator_id: int):
     if post_for_delete.user_id != creator_id:
         raise HTTPException(
             status_code=401,
-            detail='You cannot delete posts that are not your own'
-    )
+            detail=POST_DELETE_ERROR
+        )
     await session.delete(post_for_delete)
     await session.commit()
     return Response(status_code=204)
@@ -85,7 +100,7 @@ async def is_liked_post(session: AsyncSession, user_id: int, post_id: int):
     )
     if liked:
         raise HTTPException(
-            status_code=403, detail='You have already liked this post'
+            status_code=403, detail=POST_LIKE_ERROR
         )
 
 
@@ -125,7 +140,7 @@ async def is_disliked_post(session: AsyncSession, user_id: int, post_id: int):
     )
     if disliked:
         raise HTTPException(
-            status_code=403, detail='You have already disliked this post'
+            status_code=403, detail=POST_DISLIKE_ERROR
         )
 
 
@@ -133,7 +148,7 @@ async def set_like_for_post(session: AsyncSession, post_id: int, user_id: int):
     post_for_like = await get_post(session=session, post_id=post_id)
     if post_for_like.user_id == user_id:
         raise HTTPException(
-            status_code=403, detail='You cannot like your own posts'
+            status_code=403, detail=POST_OWN_LIKE_ERROR
         )
     await is_liked_post(session=session, user_id=user_id, post_id=post_id)
     await set_like_or_change_dislike_on_like(
@@ -149,7 +164,7 @@ async def set_dislike_for_post(
     if post_for_dislike.user_id == user_id:
         raise HTTPException(
             status_code=403,
-            detail='You cannot dislike your own posts'
+            detail=POST_OWN_DISLIKE_ERROR
         )
     await is_disliked_post(session=session, user_id=user_id, post_id=post_id)
     await set_dislike_or_change_like_on_dislike(

@@ -1,0 +1,7 @@
+POST_NOT_EXISTS_ERROR = 'The post with id {id} does not exist'
+POST_UPDATE_ERROR = 'You cannot update posts that are not your own'
+POST_DELETE_ERROR = 'You cannot delete posts that are not your own'
+POST_LIKE_ERROR = 'You have already liked this post'
+POST_OWN_LIKE_ERROR = 'You cannot like your own posts'
+POST_DISLIKE_ERROR = 'You have already disliked this post'
+POST_OWN_DISLIKE_ERROR = 'You cannot dislike your own posts'

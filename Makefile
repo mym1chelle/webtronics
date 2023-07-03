@@ -11,4 +11,4 @@ upgrade:
 	poetry run alembic upgrade head
 
 lint:
-	poetry run flake8 questions data main.py
+	poetry run flake8 posts users data main.py

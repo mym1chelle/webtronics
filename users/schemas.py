@@ -3,7 +3,9 @@ from pydantic import BaseModel, validator
 from datetime import datetime
 from users.constants import (
     PATTERN_PASSWORD,
-    PATTERN_USERNAME
+    PATTERN_USERNAME,
+    INVALID_USERNAME_ERROR,
+    INVALID_PASSWORD_ERROR
 )
 
 
@@ -21,7 +23,8 @@ class UserCreate(BaseModel):
     def validate_username(cls, value):
         if not PATTERN_USERNAME.match(value):
             raise HTTPException(
-                status_code=422, detail='Username должен быть не короче 5 символов и содержать буквы, цифры и знаки !@#$%^&*-_'
+                status_code=422,
+                detail=INVALID_USERNAME_ERROR
             )
         return value
 
@@ -29,7 +32,8 @@ class UserCreate(BaseModel):
     def validate_password(cls, value):
         if not PATTERN_PASSWORD.match(value):
             raise HTTPException(
-                status_code=422, detail='Password должен быть не короче 4 символов и содержать буквы цифры и знак _'
+                status_code=422,
+                detail=INVALID_PASSWORD_ERROR
             )
         return value
 

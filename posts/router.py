@@ -24,11 +24,17 @@ router = APIRouter(
 
 @router.get('/', response_model=List[ShowPostWithLikesAndDislikes])
 async def get_posts(
+    limit: int = 15,
+    offset: int = 0,
     session: AsyncSession = Depends(get_async_session),
     user=Depends(get_current_active_user)
 ):
     """Viewing posts"""
-    return await get_all_posts(session=session)
+    return await get_all_posts(
+        session=session,
+        limit=limit,
+        offset=offset
+    )
 
 
 @router.post('/', response_model=ShowPost)
